@@ -244,7 +244,7 @@ end;
         }
         xhost_end := strposL(trustRoot, '/', 9);
         if xhost_end >0 then begin
-            trustRoot := copy(trustRoot, 0, xhost_end);
+            trustRoot := copy(trustRoot, copyStart, xhost_end);
         end else trustRoot:=trustRoot+'/';
 
 
@@ -272,14 +272,14 @@ end;
         if aName= 'identity' then begin
 //            if (strlen(avalue = trim((String) $value))) then begin
 //                if (preg_match('#^xri:/*#i', $value, $m)) {
-                if copy(aValue,1,3)='xri:' then
-                    avalue := copy(avalue,4,length(aValue))
+                if copyEqual(aValue,'xri:') then
+                    avalue := copy(avalue,5,length(aValue))
 //                else if (!preg_match('/^(?:[=@+\$!\(]|https?:)/i', $value)) {
-                else if not (copy(aValue,1,5)='https') then
+                else if not copyequal(aValue,'https') then
                     avalue := 'http://'+avalue;
 
 //                if (preg_match('#^https?://[^/]+$#i', $value, $m)) {
-                if copy(aValue,1,5)='https' then
+                if copyEqual(aValue,'https') then
                     avalue :=aValue+ '/';
 
 //            end;
@@ -557,6 +557,7 @@ end;
         if(not hostExists(aurl)) then begin
             raise OpenIdException.create('Could not connect to $url.', 404);
         end;
+        xOpt:='';
 
         xparams := http_build_query(aparams, '', '&');
         if amethod ='GET' then begin
@@ -942,6 +943,7 @@ end;
 
     begin
         result := make_array;
+        xReq:='';
         // We always use SREG 1.1, even if the server is advertising only support for 1.0.
         // That's because it's fully backwards compatibile with 1.0, and some providers
         // advertise 1.0 even if they accept only 1.1. One such provider is myopenid.com
@@ -1269,7 +1271,6 @@ from: https://developers.google.com/accounts/docs/OpenID?hl=pl
 //      http://developers.facebook.com/docs/authentication/server-side/
     begin
 
-//    echo("<script> top.location.href='" . $auth_url . "'</script>")
 
         if(fdata.values['state']<>'') then begin
             setup_url := fdata.values['state'];
